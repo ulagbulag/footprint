@@ -1,0 +1,116 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: footprint
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: footprint
+  strategy:
+    rollingUpdate:
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        name: footprint
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: node-role.kubernetes.io/kiss
+                    operator: In
+                    values:
+                      - Compute
+      containers:
+        - name: footprint
+          image: quay.io/ulagbulag/footprint:latest
+          imagePullPolicy: Always
+          command:
+            - footprint-server
+          env:
+            - name: FOOTPRINT_DUMMY_BASE_ERROR_M
+              value: "0.0001"
+            - name: FOOTPRINT_DUMMY_BASE_LATITUDE
+              value: "35.227434"
+            - name: FOOTPRINT_DUMMY_BASE_LONGITUDE
+              value: "126.840322"
+            - name: FOOTPRINT_DUMMY_RADIUS_ERROR_M
+              value: "0.00003"
+            - name: FOOTPRINT_DUMMY_RADIUS_LATITUDE
+              value: "0.0003"
+            - name: FOOTPRINT_DUMMY_RADIUS_LONGITUDE
+              value: "0.0010"
+            - name: FOOTPRINT_DUMMY_STEP_VAR_ERROR_M
+              value: "0.00001"
+            - name: FOOTPRINT_DUMMY_STEP_VAR_LATITUDE
+              value: "0.00003"
+            - name: FOOTPRINT_DUMMY_STEP_VAR_LONGITUDE
+              value: "0.00003"
+            - name: FOOTPRINT_DUMMY_TICK_SEC
+              value: "1"
+            - name: FOOTPRINT_KIND
+              value: users.vine.ulagbulag.io/v1alpha1
+            - name: FOOTPRINT_NAME
+              value: my-name
+            - name: FOOTPRINT_NAMESPACE
+              value: ""
+            - name: FOOTPRINT_PROVIDER_DUMMY
+              value: "true"
+            - name: RUST_LOG
+              value: INFO
+          ports:
+            - name: http
+              protocol: TCP
+              containerPort: 80
+          livenessProbe:
+            initialDelaySeconds: 5
+            httpGet:
+              path: /
+              port: 80
+          resources:
+            requests:
+              cpu: 30m
+              memory: 20Mi
+            limits:
+              cpu: 50m
+              memory: 50Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: footprint
+  namespace: default
+  labels:
+    name: footprint
+spec:
+  type: ClusterIP
+  selector:
+    name: footprint
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 80
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: footprint
+  namespace: default
+  labels:
+    name: footprint
+spec:
+  endpoints:
+    - port: http
+      path: /metrics
+  selector:
+    matchLabels:
+      name: footprint
+  namespaceSelector:
+    matchNames:
+      - default
