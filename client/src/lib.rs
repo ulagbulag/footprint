@@ -23,7 +23,7 @@ impl Client {
 
     pub fn try_default() -> Result<Self> {
         let url = env::var("FOOTPRINT_URL")
-            .unwrap_or_else(|_| "http://prometheus-operated.vine.svc".into())
+            .unwrap_or_else(|_| "http://prometheus-operated.vine.svc:9090".into())
             .parse()?;
 
         Self::new(url)
