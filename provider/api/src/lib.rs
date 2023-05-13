@@ -60,7 +60,7 @@ mod metrics {
     }
 
     fn get_env_var(key: &str) -> String {
-        env::var("FOOTPRINT_KIND").unwrap_or_else(|error| match error {
+        env::var(key).unwrap_or_else(|error| match error {
             VarError::NotPresent => panic!("environment variable {key} not set"),
             error => panic!("{error}"),
         })

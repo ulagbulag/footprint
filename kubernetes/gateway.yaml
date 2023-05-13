@@ -1,0 +1,107 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: footprint-gateway
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: footprint-gateway
+  strategy:
+    rollingUpdate:
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        name: footprint-gateway
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: node-role.kubernetes.io/kiss
+                    operator: In
+                    values:
+                      - Compute
+      containers:
+        - name: footprint-gateway
+          image: quay.io/ulagbulag/footprint:latest
+          imagePullPolicy: Always
+          command:
+            - footprint-server-gateway
+          env:
+            - name: FOOTPRINT_URL
+              value: http://prometheus-operated.vine.svc
+            - name: RUST_LOG
+              value: INFO
+          ports:
+            - name: http
+              protocol: TCP
+              containerPort: 80
+          livenessProbe:
+            initialDelaySeconds: 5
+            httpGet:
+              path: /
+              port: 80
+          resources:
+            requests:
+              cpu: 30m
+              memory: 20Mi
+            limits:
+              cpu: 2000m
+              memory: 200Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: footprint-gateway
+  namespace: default
+  labels:
+    name: footprint-gateway
+spec:
+  type: ClusterIP
+  selector:
+    name: footprint-gateway
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: footprint-gateway
+  namespace: default
+  annotations:
+    cert-manager.io/cluster-issuer: ingress-nginx-controller.vine.svc.ops.openark
+    kubernetes.io/ingress.class: ingress-nginx-controller.vine.svc.ops.openark
+    # nginx.ingress.kubernetes.io/auth-response-headers: Authorization
+    # nginx.ingress.kubernetes.io/auth-url: http://$host/oauth2/auth
+    # nginx.ingress.kubernetes.io/auth-signin: http://$host/oauth2/start?rd=$escaped_request_uri
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    vine.ulagbulag.io/is-service: "false"
+    vine.ulagbulag.io/is-service-public: "true"
+    vine.ulagbulag.io/is-service-system: "true"
+    vine.ulagbulag.io/service-kind: Footprint Gateway
+spec:
+  # tls:
+  #   - hosts:
+  #       - ingress-nginx-controller.vine.svc.ops.openark
+  #     secretName: ingress-nginx-controller.vine.svc.ops.openark-certs
+  rules:
+    - host: ingress-nginx-controller.vine.svc.ops.openark
+      http:
+        paths:
+          - path: /footprint(/|$)(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: footprint-gateway
+                port:
+                  number: 80

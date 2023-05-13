@@ -31,7 +31,7 @@ spec:
           image: quay.io/ulagbulag/footprint:latest
           imagePullPolicy: Always
           command:
-            - footprint-server
+            - footprint-server-provider
           env:
             - name: FOOTPRINT_DUMMY_BASE_ERROR_M
               value: "0.0001"
