@@ -51,6 +51,10 @@ struct CommandGet {
     /// Search by name
     #[arg(long, value_name = "NAMESPACE")]
     namespace: Option<String>,
+
+    /// Whether to access to storage directly
+    #[arg(long)]
+    raw: bool,
 }
 
 impl CommandGet {
@@ -63,15 +67,17 @@ impl CommandGet {
 
         // Push metrics
         let writer = Client::new(self.client.url)?;
-        writer
-            .get_raw(&data)
-            .await
-            .map_err(Into::into)
-            .map(|value| {
-                if let Some(value) = value {
-                    println!("{value:?}")
-                }
-            })
+        let response = if self.raw {
+            writer.get_raw(&data).await
+        } else {
+            writer.get(&data).await
+        };
+
+        response.map_err(Into::into).map(|value| {
+            if let Some(value) = value {
+                println!("{value:?}")
+            }
+        })
     }
 }
 

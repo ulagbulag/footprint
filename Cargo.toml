@@ -1,8 +1,17 @@
 [workspace]
 default-members = ["cli"]
-members = ["api", "cli", "client", "provider/api", "provider/dummy", "server"]
+members = [
+    "api",
+    "cli",
+    "client",
+    "provider/api",
+    "provider/dummy",
+    "server/gateway",
+    "server/provider",
+]
 
 [workspace.dependencies]
+actix-cors = { version = "0.6" }
 actix-web = { version = "4.3", default-features = false, features = [
     "macros",
     "rustls",

@@ -1,8 +1,9 @@
-use std::str::FromStr;
+use std::{env, str::FromStr};
 
 use anyhow::{bail, Result};
 use chrono::Utc;
 use footprint_api::{DataRef, Location};
+use footprint_provider_api::consts;
 use reqwest::Url;
 use serde::{de::DeserializeOwned, Deserialize, Deserializer, Serialize};
 use tokio::try_join;
@@ -20,6 +21,47 @@ impl Client {
             .map_err(Into::into)
     }
 
+    pub fn try_default() -> Result<Self> {
+        let url = env::var("FOOTPRINT_URL")
+            .unwrap_or_else(|_| "prometheus-operated.vine.svc".into())
+            .parse()?;
+
+        Self::new(url)
+    }
+
+    pub async fn get(
+        &self,
+        DataRef {
+            kind,
+            name,
+            namespace,
+        }: &DataRef,
+    ) -> Result<Option<Location>> {
+        let url = self.url.clone();
+
+        let response = self
+            .inner
+            .get(url)
+            .query(&[
+                (consts::LABEL_KIND, kind.as_str()),
+                (consts::LABEL_NAME, name.as_str()),
+                (
+                    consts::LABEL_NAMESPACE,
+                    namespace.as_deref().unwrap_or_default(),
+                ),
+            ])
+            .send()
+            .await?;
+        let status = response.status();
+
+        if status.is_success() {
+            response.json().await.map_err(Into::into)
+        } else {
+            let reason = status.canonical_reason().unwrap_or_default();
+            bail!("{reason}")
+        }
+    }
+
     pub async fn get_raw(
         &self,
         DataRef {
@@ -35,24 +77,15 @@ impl Client {
 
         match try_join!(
             {
-                let query = format!(
-                    "{metric}{{{labels}}}",
-                    metric = ::footprint_provider_api::consts::METRIC_ERROR_M,
-                );
+                let query = format!("{metric}{{{labels}}}", metric = consts::METRIC_ERROR_M,);
                 self.get_raw_one_by_query(query)
             },
             {
-                let query = format!(
-                    "{metric}{{{labels}}}",
-                    metric = ::footprint_provider_api::consts::METRIC_LATITUDE,
-                );
+                let query = format!("{metric}{{{labels}}}", metric = consts::METRIC_LATITUDE,);
                 self.get_raw_one_by_query(query)
             },
             {
-                let query = format!(
-                    "{metric}{{{labels}}}",
-                    metric = ::footprint_provider_api::consts::METRIC_LONGITUDE,
-                );
+                let query = format!("{metric}{{{labels}}}", metric = consts::METRIC_LONGITUDE,);
                 self.get_raw_one_by_query(query)
             },
         )? {

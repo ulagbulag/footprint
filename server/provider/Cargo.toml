@@ -1,0 +1,32 @@
+[package]
+name = "footprint-server-provider"
+version = "0.1.0"
+edition = "2021"
+
+authors = ["Ho Kim <ho.kim@ulagbulag.io>"]
+description = "Real-time Location Information Collection of Heterogeneous Physical Resources "
+documentation = "https://docs.rs/footprint-server-provider"
+license = "GPL-3.0-or-later"
+readme = "../README.md"
+homepage = "https://github.com/ulagbulag/OpenARK"
+repository = "https://github.com/ulagbulag/OpenARK"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[features]
+default = ["dummy", "put"]
+put = []
+
+# Providers
+dummy = ["footprint-provider-dummy"]
+
+[dependencies]
+footprint-api = { path = "../../api" }
+footprint-provider-api = { path = "../../provider/api" }
+footprint-provider-dummy = { path = "../../provider/dummy", optional = true }
+
+actix-web = { workspace = true }
+actix-web-prom = { workspace = true }
+anyhow = { workspace = true }
+ark-core = { workspace = true }
+tokio = { workspace = true, features = ["full"] }
