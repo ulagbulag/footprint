@@ -63,11 +63,15 @@ impl CommandGet {
 
         // Push metrics
         let writer = Client::new(self.client.url)?;
-        writer.get(&data).await.map_err(Into::into).map(|value| {
-            if let Some(value) = value {
-                println!("{value:?}")
-            }
-        })
+        writer
+            .get_raw(&data)
+            .await
+            .map_err(Into::into)
+            .map(|value| {
+                if let Some(value) = value {
+                    println!("{value:?}")
+                }
+            })
     }
 }
 

@@ -20,7 +20,7 @@ impl Client {
             .map_err(Into::into)
     }
 
-    pub async fn get(
+    pub async fn get_raw(
         &self,
         DataRef {
             kind,
