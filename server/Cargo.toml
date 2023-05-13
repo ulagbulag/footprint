@@ -29,3 +29,4 @@ actix-web = { workspace = true }
 actix-web-prom = { workspace = true }
 anyhow = { workspace = true }
 ark-core = { workspace = true }
+tokio = { workspace = true, features = ["full"] }

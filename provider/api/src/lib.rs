@@ -1,25 +1,35 @@
-use footprint_api::Location;
-use prometheus::{Registry, Result};
-
-pub fn register(registry: &Registry) -> Result<()> {
+#[cfg(feature = "metrics")]
+pub fn register(registry: &::prometheus::Registry) -> ::prometheus::Result<()> {
     registry.register(Box::new(self::metrics::GAUGE_ERROR_M.clone()))?;
     registry.register(Box::new(self::metrics::GAUGE_LATITUDE.clone()))?;
     registry.register(Box::new(self::metrics::GAUGE_LONGITUDE.clone()))?;
     Ok(())
 }
 
+#[cfg(feature = "metrics")]
 pub fn update(
-    Location {
+    ::footprint_api::Location {
         error_m,
         latitude,
         longitude,
-    }: Location,
+    }: ::footprint_api::Location,
 ) {
     self::metrics::GAUGE_ERROR_M.set(error_m);
     self::metrics::GAUGE_LATITUDE.set(latitude);
     self::metrics::GAUGE_LONGITUDE.set(longitude);
 }
 
+pub mod consts {
+    pub const METRIC_ERROR_M: &str = "ulagbulag_footprint_error_m";
+    pub const METRIC_LATITUDE: &str = "ulagbulag_footprint_latitude";
+    pub const METRIC_LONGITUDE: &str = "ulagbulag_footprint_longitude";
+
+    pub const LABEL_KIND: &str = "kind";
+    pub const LABEL_NAME: &str = "name";
+    pub const LABEL_NAMESPACE: &str = "namespace";
+}
+
+#[cfg(feature = "metrics")]
 mod metrics {
     use std::env::{self, VarError};
 
@@ -34,17 +44,17 @@ mod metrics {
         static ref LABEL_NAMESPACE: String = env::var("FOOTPRINT_NAMESPACE").ok().unwrap_or_default();
 
         pub(crate) static ref GAUGE_ERROR_M: GenericGauge<AtomicF64> = new_gauge(
-            "ulagbulag_footprint_error_m",
+            super::consts::METRIC_ERROR_M,
             "Geolocational Data: Error as Meter",
         );
 
         pub(crate) static ref GAUGE_LATITUDE: GenericGauge<AtomicF64> = new_gauge(
-            "ulagbulag_footprint_latitude",
+            super::consts::METRIC_LATITUDE,
             "Geolocational Data: Latitude",
         );
 
         pub(crate) static ref GAUGE_LONGITUDE: GenericGauge<AtomicF64> = new_gauge(
-            "ulagbulag_footprint_longitude",
+            super::consts::METRIC_LONGITUDE,
             "Geolocational Data: Longitude",
         );
     }
@@ -58,9 +68,9 @@ mod metrics {
 
     fn get_opt(name: &str, help: &str) -> Opts {
         Opts::new(name, help)
-            .const_label("kind", LABEL_KIND.to_owned())
-            .const_label("name", LABEL_NAME.to_owned())
-            .const_label("namespace", LABEL_NAMESPACE.to_owned())
+            .const_label(super::consts::LABEL_KIND, LABEL_KIND.to_owned())
+            .const_label(super::consts::LABEL_NAME, LABEL_NAME.to_owned())
+            .const_label(super::consts::LABEL_NAMESPACE, LABEL_NAMESPACE.to_owned())
     }
 
     fn new_gauge(name: &str, help: &str) -> GenericGauge<AtomicF64> {

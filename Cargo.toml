@@ -10,6 +10,7 @@ actix-web = { version = "4.3", default-features = false, features = [
 actix-web-prom = { version = "0.6" }
 anyhow = { version = "1.0", features = ["backtrace"] }
 ark-core = { git = "https://github.com/ulagbulag/OpenARK.git" }
+chrono = { version = "0.4" }
 clap = { version = "4.1", features = ["derive", "env"] }
 lazy_static = { version = "1.4" }
 prometheus = { version = "0.13" }
@@ -21,4 +22,5 @@ reqwest = { version = "0.11", default-features = false, features = [
 ] }
 schemars = { version = "0.8", features = ["chrono", "derive", "uuid1"] }
 serde = { version = "1.0", features = ["derive"] }
-tokio = { version = "1.28", features = ["full"] }
+serde_json = { version = "1.0" }
+tokio = { version = "1.28", features = ["macros", "rt"] }

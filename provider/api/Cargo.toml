@@ -13,8 +13,12 @@ repository = "https://github.com/ulagbulag/OpenARK"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[features]
+default = ["metrics"]
+metrics = ["prometheus"]
+
 [dependencies]
 footprint-api = { path = "../../api" }
 
 lazy_static = { workspace = true }
-prometheus = { workspace = true }
+prometheus = { workspace = true, optional = true }
