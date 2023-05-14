@@ -29,29 +29,10 @@ impl Client {
         Self::new(url)
     }
 
-    pub async fn get(
-        &self,
-        DataRef {
-            kind,
-            name,
-            namespace,
-        }: &DataRef,
-    ) -> Result<Option<Location>> {
+    pub async fn get(&self, query: &DataRef) -> Result<Option<Location>> {
         let url = self.url.clone();
 
-        let response = self
-            .inner
-            .get(url)
-            .query(&[
-                (consts::LABEL_KIND, kind.as_str()),
-                (consts::LABEL_NAME, name.as_str()),
-                (
-                    consts::LABEL_NAMESPACE,
-                    namespace.as_deref().unwrap_or_default(),
-                ),
-            ])
-            .send()
-            .await?;
+        let response = self.inner.get(url).query(query).send().await?;
         let status = response.status();
 
         if status.is_success() {
