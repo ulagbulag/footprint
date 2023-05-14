@@ -3,7 +3,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: footprint-gateway
-  namespace: default
+  namespace: vine
 spec:
   replicas: 1
   selector:
@@ -53,7 +53,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: footprint-gateway
-  namespace: default
+  namespace: vine
   labels:
     name: footprint-gateway
 spec:
@@ -70,7 +70,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: footprint-gateway
-  namespace: default
+  namespace: vine
   annotations:
     cert-manager.io/cluster-issuer: ingress-nginx-controller.vine.svc.ops.openark
     kubernetes.io/ingress.class: ingress-nginx-controller.vine.svc.ops.openark
