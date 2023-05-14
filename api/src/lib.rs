@@ -15,7 +15,7 @@ pub struct DataRef {
     pub namespace: Option<String>,
 }
 
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[derive(Copy, Clone, Debug, PartialEq, Serialize, Deserialize, JsonSchema)]
 pub struct Location {
     pub error_m: f64,
     pub latitude: f64,

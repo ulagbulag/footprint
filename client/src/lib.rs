@@ -184,11 +184,16 @@ where
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub struct QueryMetric {
+    #[serde(rename = "footprint_kind")]
     pub kind: String,
+    #[serde(rename = "footprint_name")]
     pub name: String,
-    #[serde(default, skip_serializing_if = "is_empty")]
+    #[serde(
+        default,
+        rename = "footprint_namespace",
+        skip_serializing_if = "is_empty"
+    )]
     pub namespace: Option<String>,
 }
 
