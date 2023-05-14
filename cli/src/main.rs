@@ -40,7 +40,7 @@ struct CommandGet {
     #[command(flatten)]
     client: ArgsClient,
 
-    /// Search by name
+    /// Search by kind
     #[arg(long, value_name = "KIND")]
     kind: String,
 
@@ -48,7 +48,7 @@ struct CommandGet {
     #[arg(long, value_name = "NAME")]
     name: String,
 
-    /// Search by name
+    /// Search by namespace
     #[arg(long, value_name = "NAMESPACE")]
     namespace: Option<String>,
 
