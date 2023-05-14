@@ -66,11 +66,11 @@ impl CommandGet {
         };
 
         // Push metrics
-        let writer = Client::new(self.client.url)?;
+        let client = Client::new(self.client.url)?;
         let response = if self.raw {
-            writer.get_raw(&data).await
+            client.get_raw(&data).await
         } else {
-            writer.get(&data).await
+            client.get(&data).await
         };
 
         response.map_err(Into::into).map(|value| {
@@ -95,8 +95,8 @@ struct CommandQuery {
 impl CommandQuery {
     async fn run(self) -> Result<()> {
         // Push metrics
-        let writer = Client::new(self.client.url)?;
-        writer
+        let client = Client::new(self.client.url)?;
+        client
             .get_raw_vec_all_by_query(&self.query)
             .await
             .map_err(Into::into)
