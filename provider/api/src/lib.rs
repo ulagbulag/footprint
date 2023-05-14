@@ -24,9 +24,9 @@ pub mod consts {
     pub const METRIC_LATITUDE: &str = "ulagbulag_footprint_latitude";
     pub const METRIC_LONGITUDE: &str = "ulagbulag_footprint_longitude";
 
-    pub const LABEL_KIND: &str = "kind";
-    pub const LABEL_NAME: &str = "name";
-    pub const LABEL_NAMESPACE: &str = "namespace";
+    pub const LABEL_KIND: &str = "footprint_kind";
+    pub const LABEL_NAME: &str = "footprint_name";
+    pub const LABEL_NAMESPACE: &str = "footprint_namespace";
 }
 
 #[cfg(feature = "metrics")]

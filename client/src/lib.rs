@@ -71,7 +71,10 @@ impl Client {
         }: &DataRef,
     ) -> Result<Option<Location>> {
         let labels = format!(
-            "kind={kind:?},name={name:?},namespace={namespace:?}",
+            "{label_kind}={kind:?},{label_name}={name:?},{label_namespace}={namespace:?}",
+            label_kind = consts::LABEL_KIND,
+            label_name = consts::LABEL_NAME,
+            label_namespace = consts::LABEL_NAMESPACE,
             namespace = namespace.as_deref().unwrap_or_default(),
         );
 
