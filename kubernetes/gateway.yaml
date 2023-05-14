@@ -34,7 +34,7 @@ spec:
             - footprint-server-gateway
           env:
             - name: FOOTPRINT_URL
-              value: http://prometheus-operated.vine.svc:9090
+              value: http://prometheus-operated:9090
             - name: RUST_LOG
               value: INFO
           ports:
