@@ -1,3 +1,76 @@
+#[cfg(feature = "env")]
+pub mod env {
+    use std::{
+        env::{self, VarError},
+        error::Error,
+        future::Future,
+        str::FromStr,
+        time::Duration,
+    };
+
+    use anyhow::{anyhow, Result};
+    use tokio::time::sleep;
+
+    pub struct Tick {
+        interval: Duration,
+    }
+
+    impl Tick {
+        pub fn new() -> Result<Self> {
+            let tick_sec = env_var("FOOTPRINT_DUMMY_TICK_SEC")?;
+            Ok(Self {
+                interval: Duration::from_secs_f64(tick_sec),
+            })
+        }
+
+        pub fn spawn<F>(self, mut f: F)
+        where
+            F: 'static + Send + FnMut() -> Result<()>,
+        {
+            ::tokio::task::spawn(async move {
+                loop {
+                    if let Err(error) = f() {
+                        eprintln!("failed to update data: {error}");
+                    }
+                    sleep(self.interval).await;
+                }
+            });
+        }
+
+        pub fn spawn_async<F, Fut>(self, f: F)
+        where
+            F: 'static + Send + Sync + Fn() -> Fut,
+            Fut: 'static + Send + Future<Output = Result<()>>,
+        {
+            ::tokio::task::spawn(async move {
+                loop {
+                    if let Err(error) = f().await {
+                        eprintln!("failed to update data: {error}");
+                    }
+                    sleep(self.interval).await;
+                }
+            });
+        }
+    }
+
+    pub fn env_var<T>(key: &str) -> Result<T>
+    where
+        T: FromStr,
+        <T as FromStr>::Err: Error,
+    {
+        env::var(key)
+            .map_err(|error| match error {
+                VarError::NotPresent => anyhow!("no such environment variable: {key}"),
+                error => anyhow!("failed to get environment variable: {key}: {error}"),
+            })
+            .and_then(|value| {
+                value.parse().map_err(|error| {
+                    anyhow!("failed to parse environment variable: {key}: {error}")
+                })
+            })
+    }
+}
+
 #[cfg(feature = "metrics")]
 pub fn register(registry: &::prometheus::Registry) -> ::prometheus::Result<()> {
     registry.register(Box::new(self::metrics::GAUGE_ERROR_M.clone()))?;

@@ -15,9 +15,8 @@ repository = "https://github.com/ulagbulag/OpenARK"
 
 [dependencies]
 footprint-api = { path = "../../api" }
-footprint-provider-api = { path = "../api" }
+footprint-provider-api = { path = "../api", features = ["env"] }
 
 anyhow = { workspace = true }
 rand = { workspace = true }
 rand_distr = { workspace = true }
-tokio = { workspace = true }

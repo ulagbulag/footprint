@@ -6,6 +6,7 @@ members = [
     "client",
     "provider/api",
     "provider/dummy",
+    "provider/sewio-uwb",
     "server/gateway",
     "server/provider",
 ]

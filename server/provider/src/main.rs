@@ -38,9 +38,14 @@ async fn main() {
 
         ::footprint_provider_api::register(&prometheus.registry)?;
 
-        #[cfg(feature = "dummy")]
-        if infer::<_, bool>("FOOTPRINT_PROVIDER_DUMMY").unwrap_or_default() {
-            ::footprint_provider_dummy::spawn()?
+        match infer::<_, String>("FOOTPRINT_PROVIDER")?.as_str() {
+            #[cfg(feature = "dummy")]
+            "dummy" => ::footprint_provider_dummy::spawn()?,
+
+            #[cfg(feature = "sewio-uwb")]
+            "sewio-uwb" => ::footprint_provider_sewio_uwb::spawn()?,
+
+            provider => panic!("unknown footprint provider: {provider}"),
         }
 
         // Start web server

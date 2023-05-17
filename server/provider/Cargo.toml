@@ -14,16 +14,18 @@ repository = "https://github.com/ulagbulag/OpenARK"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [features]
-default = ["dummy", "put"]
+default = ["dummy", "put", "sewio-uwb"]
 put = []
 
 # Providers
 dummy = ["footprint-provider-dummy"]
+sewio-uwb = ["footprint-provider-sewio-uwb"]
 
 [dependencies]
 footprint-api = { path = "../../api" }
-footprint-provider-api = { path = "../../provider/api" }
+footprint-provider-api = { path = "../../provider/api", features = ["metrics"] }
 footprint-provider-dummy = { path = "../../provider/dummy", optional = true }
+footprint-provider-sewio-uwb = { path = "../../provider/sewio-uwb", optional = true }
 
 actix-web = { workspace = true }
 actix-web-prom = { workspace = true }
