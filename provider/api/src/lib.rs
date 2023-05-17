@@ -17,7 +17,7 @@ pub mod env {
 
     impl Tick {
         pub fn new() -> Result<Self> {
-            let tick_sec = env_var("FOOTPRINT_DUMMY_TICK_SEC")?;
+            let tick_sec = env_var("FOOTPRINT_TICK_SEC")?;
             Ok(Self {
                 interval: Duration::from_secs_f64(tick_sec),
             })

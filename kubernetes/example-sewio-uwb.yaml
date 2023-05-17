@@ -33,6 +33,12 @@ spec:
           command:
             - footprint-server-provider
           env:
+            - name: FOOTPRINT_API_ID
+              value: "__API_ID__"
+            - name: FOOTPRINT_API_KEY
+              value: "__API_KEY__"
+            - name: FOOTPRINT_API_URL
+              value: "__API_URL__"
             - name: FOOTPRINT_BASE_ERROR_M
               value: "0.0001"
             - name: FOOTPRINT_BASE_LATITUDE
@@ -49,12 +55,6 @@ spec:
               value: ""
             - name: FOOTPRINT_PROVIDER
               value: sewio-uwb
-            - name: FOOTPRINT_API_ID
-              value: "__ID__"
-            - name: FOOTPRINT_API_KEY
-              value: "__API_KEY__"
-            - name: FOOTPRINT_API_URL
-              value: www.sewio-uwb.svc.ops.openark
             - name: RUST_LOG
               value: INFO
           ports:
