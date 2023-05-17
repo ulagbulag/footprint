@@ -30,7 +30,7 @@ impl Add<Location> for Base {
     type Output = Location;
 
     fn add(self, local: Location) -> Self::Output {
-        let length = local.latitude * local.latitude + local.longitude * local.longitude;
+        let length = (local.latitude * local.latitude + local.longitude * local.longitude).sqrt();
         let rotation = self.rotation + local.latitude.atan2(local.longitude);
 
         let latitude = rotation.sin() * length;
