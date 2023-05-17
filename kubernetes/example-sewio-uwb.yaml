@@ -53,6 +53,10 @@ spec:
               value: ""
             - name: FOOTPRINT_PROVIDER
               value: sewio-uwb
+            - name: FOOTPRINT_SCALE_LATITUDE
+              value: "1"
+            - name: FOOTPRINT_SCALE_LONGITUDE
+              value: "1"
             - name: FOOTPRINT_TICK_SEC
               value: "1"
             - name: RUST_LOG

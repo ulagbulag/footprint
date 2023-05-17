@@ -1,7 +1,7 @@
-use std::sync::Arc;
+use std::{f64, sync::Arc};
 
 use anyhow::{anyhow, Result};
-use footprint_api::{Base, Location};
+use footprint_api::{Base, Location, LocationVector, LocationVectorScale};
 use footprint_provider_api::env::{env_var, Tick};
 use reqwest::{Client, Url};
 use serde::Deserialize;
@@ -22,6 +22,7 @@ struct Metrics {
     client: Client,
     id: usize,
     key: String,
+    scale: LocationVectorScale,
     url: Url,
 }
 
@@ -36,13 +37,17 @@ impl Metrics {
                 location: Location {
                     error_m: env_base("ERROR_M")?,
                     latitude: env_base("LATITUDE")?,
-                    longitude: env_base("LATITUDE")?,
+                    longitude: env_base("LONGITUDE")?,
                 },
-                rotation: env_base("ROTATION")?,
+                rotation: env_base("ROTATION")? / f64::consts::PI * 180.0,
             },
             client: Client::new(),
             id: env_var("FOOTPRINT_API_ID")?,
             key: env_var("FOOTPRINT_API_KEY")?,
+            scale: LocationVectorScale {
+                latitude: env_var("FOOTPRINT_SCALE_LATITUDE")?,
+                longitude: env_var("FOOTPRINT_SCALE_LONGITUDE")?,
+            },
             url: env_var("FOOTPRINT_API_URL")?,
         })
     }
@@ -58,12 +63,12 @@ impl Metrics {
             .json()
             .await?;
 
-        let local_location = Location {
+        let local_location = LocationVector {
             error_m: 0.0,
-            latitude: response.parse_value("posY")?,
-            longitude: response.parse_value("posX")?,
+            latitude_m: -response.parse_value("posY")?,
+            longitude_m: response.parse_value("posX")?,
         };
-        Ok(self.base + local_location)
+        Ok(self.base + local_location * self.scale)
     }
 }
 
