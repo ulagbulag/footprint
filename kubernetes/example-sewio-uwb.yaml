@@ -45,8 +45,6 @@ spec:
               value: "35.227434"
             - name: FOOTPRINT_BASE_LONGITUDE
               value: "126.840322"
-            - name: FOOTPRINT_TICK_SEC
-              value: "1"
             - name: FOOTPRINT_KIND
               value: users.vine.ulagbulag.io/v1alpha1
             - name: FOOTPRINT_NAME
@@ -55,6 +53,8 @@ spec:
               value: ""
             - name: FOOTPRINT_PROVIDER
               value: sewio-uwb
+            - name: FOOTPRINT_TICK_SEC
+              value: "1"
             - name: RUST_LOG
               value: INFO
           ports:

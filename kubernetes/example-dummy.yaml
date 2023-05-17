@@ -39,6 +39,14 @@ spec:
               value: "35.227434"
             - name: FOOTPRINT_BASE_LONGITUDE
               value: "126.840322"
+            - name: FOOTPRINT_KIND
+              value: users.vine.ulagbulag.io/v1alpha1
+            - name: FOOTPRINT_NAME
+              value: my-name
+            - name: FOOTPRINT_NAMESPACE
+              value: ""
+            - name: FOOTPRINT_PROVIDER
+              value: dummy
             - name: FOOTPRINT_RADIUS_ERROR_M
               value: "0.00003"
             - name: FOOTPRINT_RADIUS_LATITUDE
@@ -53,14 +61,6 @@ spec:
               value: "0.00003"
             - name: FOOTPRINT_TICK_SEC
               value: "1"
-            - name: FOOTPRINT_KIND
-              value: users.vine.ulagbulag.io/v1alpha1
-            - name: FOOTPRINT_NAME
-              value: my-name
-            - name: FOOTPRINT_NAMESPACE
-              value: ""
-            - name: FOOTPRINT_PROVIDER
-              value: dummy
             - name: RUST_LOG
               value: INFO
           ports:
