@@ -4,9 +4,9 @@ use anyhow::{bail, Result};
 use chrono::Utc;
 use footprint_api::{DataRef, Location};
 use footprint_provider_api::consts;
+use futures::try_join;
 use reqwest::Url;
 use serde::{de::DeserializeOwned, Deserialize, Deserializer, Serialize};
-use tokio::try_join;
 
 pub struct Client {
     inner: ::reqwest::Client,
