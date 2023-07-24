@@ -27,7 +27,7 @@ lazy_static = { version = "=1.4" }
 prometheus = { version = "=0.13" }
 rand = { version = "=0.8" }
 rand_distr = { version = "=0.4" }
-reqwest = { package = "reqwest-wasm", version = "=0.11", default-features = false, features = [
+reqwest = { git = "https://github.com/ulagbulag/reqwest-wasm.git", package = "reqwest-wasm", version = "=0.11", default-features = false, features = [
     "json",
     "rustls-tls",
 ] }
