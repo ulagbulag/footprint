@@ -24,10 +24,11 @@ run *ARGS:
   cargo run --package "${DEFAULT_RUNTIME_PACKAGE}" --release -- {{ ARGS }}
 
 oci-build:
-  docker build \
+  docker buildx build \
+    --pull \
+    --push \
     --tag "${OCI_IMAGE}:${OCI_IMAGE_VERSION}" \
     --build-arg ALPINE_VERSION="${ALPINE_VERSION}" \
     .
 
 oci-push: oci-build
-  docker push "${OCI_IMAGE}:${OCI_IMAGE_VERSION}"
