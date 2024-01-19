@@ -4,6 +4,7 @@ members = [
     "api",
     "cli",
     "client",
+    "pipe",
     "provider/api",
     "provider/dummy",
     "provider/sewio-uwb",
@@ -13,29 +14,48 @@ members = [
 resolver = "2"
 
 [workspace.dependencies]
-actix-cors = { version = "=0.6" }
-actix-web = { version = "=4.4", default-features = false, features = [
+actix-cors = { version = "0.7" }
+actix-web = { version = "4.4", default-features = false, features = [
     "macros",
     "rustls",
 ] }
-actix-web-prom = { version = "=0.7" }
-anyhow = { version = "=1.0", features = ["backtrace"] }
+actix-web-prom = { version = "0.7" }
+anyhow = { version = "1.0", features = ["backtrace"] }
 ark-core = { git = "https://github.com/ulagbulag/OpenARK.git" }
-chrono = { version = "=0.4" }
-clap = { version = "=4.4", features = ["derive", "env"] }
-futures = { version = "=0.3" }
-lazy_static = { version = "=1.4" }
-prometheus = { version = "=0.13" }
-rand = { version = "=0.8" }
-rand_distr = { version = "=0.4" }
-reqwest = { git = "https://github.com/ulagbulag/reqwest-wasm.git", package = "reqwest-wasm", version = "=0.11", default-features = false, features = [
+async-trait = { version = "0.1" }
+chrono = { version = "0.4" }
+clap = { version = "4.4", features = ["derive", "env"] }
+dash-pipe-provider = { git = "https://github.com/ulagbulag/OpenARK.git" }
+futures = { version = "0.3" }
+lazy_static = { version = "1.4" }
+prometheus = { version = "0.13" }
+rand = { version = "0.8" }
+rand_distr = { version = "0.4" }
+reqwest = { version = "0.11", default-features = false, features = [
     "json",
     "rustls-tls",
 ] }
-schemars = { version = "=0.8", features = ["chrono", "derive", "uuid1"] }
-serde = { version = "=1.0", features = ["derive"] }
-serde_json = { version = "=1.0" }
-tokio = { version = "=1.32", default-features = false, features = [
+schemars = { version = "0.8", features = ["chrono", "derive", "uuid1"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = { version = "1.0" }
+tokio = { version = "1.35", default-features = false, features = [
     "macros",
     "rt",
 ] }
+tungstenite = { package = "tokio-tungstenite", version = "0.21", features = [
+    "rustls-tls-native-roots",
+] }
+url = { version = "2.5" }
+
+[patch.crates-io]
+deltalake = { git = "https://github.com/delta-io/delta-rs.git", rev = "bca00ae0540a452cc465ab0c3d292fef90d8fda0" }
+# FIXME: push a PR: rustls-tls feature support
+minio = { git = "https://github.com/ulagbulag/minio-rs.git" }                                                      # not deployed to crates.io
+opentelemetry = { git = "https://github.com/ulagbulag/opentelemetry-rust", branch = "feat/schemars" }
+opentelemetry-otlp = { git = "https://github.com/ulagbulag/opentelemetry-rust", branch = "feat/schemars" }
+opentelemetry-proto = { git = "https://github.com/ulagbulag/opentelemetry-rust", branch = "feat/schemars" }
+opentelemetry_sdk = { git = "https://github.com/ulagbulag/opentelemetry-rust", branch = "feat/schemars" }
+or-tools = { git = "https://github.com/ulagbulag/or-tools-rs" }
+schemars = { git = "https://github.com/ulagbulag/schemars" }
+sio = { git = "https://github.com/ulagbulag/sio-rs.git" }
+tracing-opentelemetry = { git = "https://github.com/ulagbulag/tracing-opentelemetry", branch = "chore/histogram" }

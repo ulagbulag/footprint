@@ -81,11 +81,15 @@ pub fn register(registry: &::prometheus::Registry) -> ::prometheus::Result<()> {
 
 #[cfg(feature = "metrics")]
 pub fn update(
-    ::footprint_api::Location {
-        error_m,
-        latitude,
-        longitude,
-    }: ::footprint_api::Location,
+    ::footprint_api::ObjectLocation {
+        id: _,
+        location:
+            ::footprint_api::Location {
+                error_m,
+                latitude,
+                longitude,
+            },
+    }: ::footprint_api::ObjectLocation,
 ) {
     self::metrics::GAUGE_ERROR_M.set(error_m);
     self::metrics::GAUGE_LATITUDE.set(latitude);

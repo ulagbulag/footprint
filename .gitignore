@@ -15,3 +15,7 @@ Cargo.lock
 
 # Editor
 /.vscode/
+
+# Dev
+**/.env
+**/.token

@@ -13,10 +13,20 @@ repository = "https://github.com/ulagbulag/OpenARK"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[features]
+default = []
+metrics = ["footprint-provider-api/metrics", "reqwest"]
+websocket = ["futures", "serde_json", "tokio", "tungstenite"]
+
 [dependencies]
 footprint-api = { path = "../../api" }
 footprint-provider-api = { path = "../api", features = ["env"] }
 
 anyhow = { workspace = true }
-reqwest = { workspace = true }
+futures = { workspace = true, optional = true }
+reqwest = { workspace = true, optional = true }
 serde = { workspace = true }
+serde_json = { workspace = true, optional = true }
+tokio = { workspace = true, optional = true, features = ["net", "sync"] }
+tungstenite = { workspace = true, optional = true }
+url = { workspace = true }

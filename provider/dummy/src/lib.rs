@@ -1,41 +1,45 @@
 use anyhow::Result;
-use footprint_api::Location;
+use footprint_api::{Location, ObjectLocation};
 use footprint_provider_api::env::{env_var, Tick};
 use rand::{rngs::StdRng, Rng, SeedableRng};
 use rand_distr::Normal;
+use tokio::sync::Mutex;
 
-pub fn spawn() -> Result<()> {
-    let mut metrics = Metrics::new()?;
+pub async fn spawn() -> Result<()> {
+    let metrics = ::std::sync::Arc::new(Metrics::new().await?);
     let tick = Tick::new()?;
 
-    tick.spawn(move || {
-        ::footprint_provider_api::update(metrics.next());
-        Ok(())
+    tick.spawn_async(move || {
+        let metrics = metrics.clone();
+        async move { metrics.next().await.map(::footprint_provider_api::update) }
     });
     Ok(())
 }
 
 struct Metrics {
-    error_m: Metric,
-    latitude: Metric,
-    longitude: Metric,
+    error_m: Mutex<Metric>,
+    latitude: Mutex<Metric>,
+    longitude: Mutex<Metric>,
 }
 
 impl Metrics {
-    fn new() -> Result<Self> {
+    pub async fn new() -> Result<Self> {
         Ok(Self {
-            error_m: Metric::new("ERROR_M", true)?,
-            latitude: Metric::new("LATITUDE", false)?,
-            longitude: Metric::new("LONGITUDE", false)?,
+            error_m: Mutex::new(Metric::new("ERROR_M", true)?),
+            latitude: Mutex::new(Metric::new("LATITUDE", false)?),
+            longitude: Mutex::new(Metric::new("LONGITUDE", false)?),
         })
     }
 
-    fn next(&mut self) -> Location {
-        Location {
-            error_m: self.error_m.next(),
-            latitude: self.latitude.next(),
-            longitude: self.longitude.next(),
-        }
+    pub async fn next(&self) -> Result<ObjectLocation> {
+        Ok(ObjectLocation {
+            id: 0,
+            location: Location {
+                error_m: self.error_m.lock().await.next(),
+                latitude: self.latitude.lock().await.next(),
+                longitude: self.longitude.lock().await.next(),
+            },
+        })
     }
 }
 

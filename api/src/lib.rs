@@ -65,6 +65,13 @@ impl Add<LocationVector> for Base {
 }
 
 #[derive(Copy, Clone, Debug, PartialEq, Serialize, Deserialize, JsonSchema)]
+pub struct ObjectLocation {
+    pub id: usize,
+    #[serde(flatten)]
+    pub location: Location,
+}
+
+#[derive(Copy, Clone, Debug, PartialEq, Serialize, Deserialize, JsonSchema)]
 pub struct Location {
     pub error_m: f64,
     pub latitude: f64,

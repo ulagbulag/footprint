@@ -40,10 +40,10 @@ async fn main() {
 
         match infer::<_, String>("FOOTPRINT_PROVIDER")?.as_str() {
             #[cfg(feature = "dummy")]
-            "dummy" => ::footprint_provider_dummy::spawn()?,
+            "dummy" => ::footprint_provider_dummy::spawn().await?,
 
             #[cfg(feature = "sewio-uwb")]
-            "sewio-uwb" => ::footprint_provider_sewio_uwb::spawn()?,
+            "sewio-uwb" => ::footprint_provider_sewio_uwb::spawn().await?,
 
             provider => panic!("unknown footprint provider: {provider}"),
         }
