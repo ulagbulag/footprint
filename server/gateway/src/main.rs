@@ -7,7 +7,7 @@ use actix_web::{
     App, HttpResponse, HttpServer, Responder,
 };
 use anyhow::Result;
-use ark_core::{env::infer, logger};
+use ark_core::{env::infer, tracer};
 use footprint_api::DataRef;
 use footprint_client::Client;
 
@@ -61,6 +61,6 @@ async fn main() {
         .map_err(Into::into)
     }
 
-    logger::init_once();
+    tracer::init_once();
     try_main().await.expect("running a server")
 }

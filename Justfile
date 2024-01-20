@@ -1,5 +1,5 @@
 # Configure environment variables
-export ALPINE_VERSION := env_var_or_default('ALPINE_VERSION', '3.17')
+export ALPINE_VERSION := env_var_or_default('ALPINE_VERSION', '3.19')
 export OCI_IMAGE := env_var_or_default('OCI_IMAGE', 'quay.io/ulagbulag/footprint')
 export OCI_IMAGE_VERSION := env_var_or_default('OCI_IMAGE_VERSION', 'latest')
 

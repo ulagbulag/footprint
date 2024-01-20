@@ -44,7 +44,7 @@ impl ::dash_pipe_provider::Function for Function {
 
     async fn tick(
         &mut self,
-        inputs: PipeMessages<<Self as ::dash_pipe_provider::Function>::Input>,
+        _inputs: PipeMessages<<Self as ::dash_pipe_provider::Function>::Input>,
     ) -> Result<PipeMessages<<Self as ::dash_pipe_provider::Function>::Output>> {
         Ok(PipeMessages::Single(PipeMessage::new(
             self.metrics.next().await?,

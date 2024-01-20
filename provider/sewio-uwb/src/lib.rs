@@ -62,7 +62,7 @@ impl Metrics {
 
                 Client::Websocket {
                     reader: reader.into(),
-                    // writer,
+                    writer: writer.into(),
                 }
             }
             scheme => bail!("unsupported scheme: {scheme}"),
@@ -107,19 +107,41 @@ impl Metrics {
             }
 
             #[cfg(feature = "websocket")]
-            Client::Websocket { reader, .. } => {
-                use futures::TryStreamExt;
+            Client::Websocket { reader, writer } => {
+                use std::time::Duration;
+
+                use futures::{SinkExt, TryStreamExt};
+                use tokio::{select, time::sleep};
+                use tungstenite::tungstenite::Message;
 
                 loop {
                     let message = {
                         let mut reader = reader.lock().await;
-                        reader
-                            .try_next()
-                            .await?
-                            .ok_or_else(|| ::anyhow::anyhow!("connection closed"))?
+
+                        loop {
+                            let future_next = reader.try_next();
+                            let future_timeout = sleep(Duration::from_secs(30));
+                            select! {
+                                message = future_next => break message?.ok_or_else(|| ::anyhow::anyhow!("connection closed"))?,
+                                () = future_timeout => {
+                                    let mut writer = writer.lock().await;
+
+                                    // send ping
+                                    let payload = Message::Ping(Vec::default());
+                                    writer.send(payload).await?;
+                                    continue
+                                },
+                            };
+                        }
                     };
 
-                    let entity: WebsocketEntity = ::serde_json::from_slice(&message.into_data())?;
+                    // verify message
+                    let message = match message {
+                        Message::Text(message) if !message.is_empty() => message,
+                        _ => continue,
+                    };
+
+                    let entity: WebsocketEntity = ::serde_json::from_str(&message)?;
                     match LocationVector::try_from(&entity.body) {
                         Ok(local_location) => {
                             break Ok(self.calibrate(entity.body.id.parse()?, local_location))
@@ -150,7 +172,9 @@ enum Client {
     #[cfg(feature = "websocket")]
     Websocket {
         reader: ::tokio::sync::Mutex<::futures::stream::SplitStream<WebSocketStream>>,
-        // writer: ::futures::stream::SplitSink<WebSocketStream, ::tungstenite::tungstenite::Message>,
+        writer: ::tokio::sync::Mutex<
+            ::futures::stream::SplitSink<WebSocketStream, ::tungstenite::tungstenite::Message>,
+        >,
     },
 }
 

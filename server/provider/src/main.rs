@@ -3,7 +3,7 @@ use std::net::SocketAddr;
 use actix_web::{get, App, HttpResponse, HttpServer, Responder};
 use actix_web_prom::PrometheusMetricsBuilder;
 use anyhow::{anyhow, Result};
-use ark_core::{env::infer, logger};
+use ark_core::{env::infer, tracer};
 
 #[get("/")]
 async fn index() -> impl Responder {
@@ -18,7 +18,7 @@ async fn health() -> impl Responder {
 #[cfg(feature = "put")]
 #[::actix_web::put("/")]
 async fn put(
-    ::actix_web::web::Json(location): ::actix_web::web::Json<::footprint_api::Location>,
+    ::actix_web::web::Json(location): ::actix_web::web::Json<::footprint_api::ObjectLocation>,
 ) -> impl Responder {
     ::footprint_provider_api::update(location);
     HttpResponse::Ok().finish()
@@ -71,6 +71,6 @@ async fn main() {
         .map_err(Into::into)
     }
 
-    logger::init_once();
+    tracer::init_once();
     try_main().await.expect("running a server")
 }
