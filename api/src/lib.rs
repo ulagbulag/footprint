@@ -93,8 +93,8 @@ impl Mul<LocationVectorScale> for LocalLocation {
         Location {
             global: GlobalLocation {
                 error_m: self.error_m,
-                latitude: self.x * scale.latitude,
-                longitude: self.y * scale.longitude,
+                latitude: self.y * scale.latitude,
+                longitude: self.x * scale.longitude,
             },
             local: self,
         }
