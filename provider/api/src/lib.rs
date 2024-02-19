@@ -85,9 +85,13 @@ pub fn update(
         id: _,
         location:
             ::footprint_api::Location {
-                error_m,
-                latitude,
-                longitude,
+                global:
+                    ::footprint_api::GlobalLocation {
+                        error_m,
+                        latitude,
+                        longitude,
+                    },
+                local: _,
             },
     }: ::footprint_api::ObjectLocation,
 ) {

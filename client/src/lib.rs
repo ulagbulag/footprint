@@ -2,7 +2,7 @@ use std::{env, str::FromStr};
 
 use anyhow::{bail, Result};
 use chrono::Utc;
-use footprint_api::{DataRef, Location};
+use footprint_api::{DataRef, GlobalLocation, LocalLocation, Location};
 use footprint_provider_api::consts;
 use futures::try_join;
 use reqwest::Url;
@@ -74,9 +74,12 @@ impl Client {
             },
         )? {
             (Some(error_m), Some(latitude), Some(longitude)) => Ok(Some(Location {
-                error_m,
-                latitude,
-                longitude,
+                global: GlobalLocation {
+                    error_m,
+                    latitude,
+                    longitude,
+                },
+                local: LocalLocation::default(),
             })),
             _ => Ok(None),
         }

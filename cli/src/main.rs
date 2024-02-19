@@ -1,6 +1,6 @@
 use anyhow::Result;
 use clap::{Parser, Subcommand};
-use footprint_api::{DataRef, Location};
+use footprint_api::{DataRef, GlobalLocation, LocalLocation, Location};
 use footprint_client::Client;
 use reqwest::Url;
 
@@ -126,9 +126,12 @@ struct CommandUpdate {
 impl CommandUpdate {
     async fn run(self) -> Result<()> {
         let location = Location {
-            error_m: self.error_m,
-            latitude: self.latitude,
-            longitude: self.longitude,
+            global: GlobalLocation {
+                error_m: self.error_m,
+                latitude: self.latitude,
+                longitude: self.longitude,
+            },
+            local: LocalLocation::default(),
         };
 
         // Push metrics

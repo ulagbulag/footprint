@@ -1,7 +1,7 @@
 use std::f64;
 
 use anyhow::{bail, Error, Result};
-use footprint_api::{Base, Location, LocationVector, LocationVectorScale, ObjectLocation};
+use footprint_api::{Base, GlobalLocation, LocationMetric, LocationVectorScale, ObjectLocation};
 use footprint_provider_api::env::env_var;
 use url::Url;
 
@@ -70,7 +70,7 @@ impl Metrics {
 
         Ok(Self {
             base: Base {
-                location: Location {
+                location: GlobalLocation {
                     error_m: env_base("ERROR_M")?,
                     latitude: env_base("LATITUDE")?,
                     longitude: env_base("LONGITUDE")?,
@@ -102,7 +102,7 @@ impl Metrics {
                     .json()
                     .await?;
 
-                let local_location = LocationVector::try_from(&entity)?;
+                let local_location = LocationMetric::try_from(&entity)?;
                 Ok(self.calibrate(entity.id.parse()?, local_location))
             }
 
@@ -142,7 +142,7 @@ impl Metrics {
                     };
 
                     let entity: WebsocketEntity = ::serde_json::from_str(&message)?;
-                    match LocationVector::try_from(&entity.body) {
+                    match LocationMetric::try_from(&entity.body) {
                         Ok(local_location) => {
                             break Ok(self.calibrate(entity.body.id.parse()?, local_location))
                         }
@@ -153,7 +153,7 @@ impl Metrics {
         }
     }
 
-    fn calibrate(&self, id: usize, local_location: LocationVector) -> ObjectLocation {
+    fn calibrate(&self, id: usize, local_location: LocationMetric) -> ObjectLocation {
         ObjectLocation {
             id,
             location: self.base + local_location * self.scale,
@@ -191,14 +191,14 @@ struct Entity {
     datastreams: Vec<DataStream>,
 }
 
-impl TryFrom<&Entity> for LocationVector {
+impl TryFrom<&Entity> for LocationMetric {
     type Error = Error;
 
     fn try_from(entity: &Entity) -> Result<Self, Self::Error> {
-        Ok(LocationVector {
+        Ok(LocationMetric {
             error_m: 0.0,
-            latitude_m: -entity.parse_value("posY")?,
-            longitude_m: entity.parse_value("posX")?,
+            x_m: -entity.parse_value("posY")?,
+            y_m: entity.parse_value("posX")?,
         })
     }
 }

@@ -1,5 +1,5 @@
 use anyhow::Result;
-use footprint_api::{Location, ObjectLocation};
+use footprint_api::{GlobalLocation, LocalLocation, Location, ObjectLocation};
 use footprint_provider_api::env::{env_var, Tick};
 use rand::{rngs::StdRng, Rng, SeedableRng};
 use rand_distr::Normal;
@@ -35,9 +35,12 @@ impl Metrics {
         Ok(ObjectLocation {
             id: 0,
             location: Location {
-                error_m: self.error_m.lock().await.next(),
-                latitude: self.latitude.lock().await.next(),
-                longitude: self.longitude.lock().await.next(),
+                global: GlobalLocation {
+                    error_m: self.error_m.lock().await.next(),
+                    latitude: self.latitude.lock().await.next(),
+                    longitude: self.longitude.lock().await.next(),
+                },
+                local: LocalLocation::default(),
             },
         })
     }
