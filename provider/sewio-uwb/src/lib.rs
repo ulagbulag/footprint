@@ -1,7 +1,7 @@
 use std::f64;
 
 use anyhow::{bail, Error, Result};
-use footprint_api::{Base, GlobalLocation, LocationMetric, LocationVectorScale, ObjectLocation};
+use footprint_api::{Base, GlobalLocation, LocalLocation, LocationVectorScale, ObjectLocation};
 use footprint_provider_api::env::env_var;
 use url::Url;
 
@@ -102,7 +102,7 @@ impl Metrics {
                     .json()
                     .await?;
 
-                let local_location = LocationMetric::try_from(&entity)?;
+                let local_location = LocalLocation::try_from(&entity)?;
                 Ok(self.calibrate(entity.id.parse()?, local_location))
             }
 
@@ -142,7 +142,7 @@ impl Metrics {
                     };
 
                     let entity: WebsocketEntity = ::serde_json::from_str(&message)?;
-                    match LocationMetric::try_from(&entity.body) {
+                    match LocalLocation::try_from(&entity.body) {
                         Ok(local_location) => {
                             break Ok(self.calibrate(entity.body.id.parse()?, local_location))
                         }
@@ -153,7 +153,7 @@ impl Metrics {
         }
     }
 
-    fn calibrate(&self, id: usize, local_location: LocationMetric) -> ObjectLocation {
+    fn calibrate(&self, id: usize, local_location: LocalLocation) -> ObjectLocation {
         ObjectLocation {
             id,
             location: self.base + local_location * self.scale,
@@ -191,14 +191,14 @@ struct Entity {
     datastreams: Vec<DataStream>,
 }
 
-impl TryFrom<&Entity> for LocationMetric {
+impl TryFrom<&Entity> for LocalLocation {
     type Error = Error;
 
     fn try_from(entity: &Entity) -> Result<Self, Self::Error> {
-        Ok(LocationMetric {
+        Ok(LocalLocation {
             error_m: 0.0,
-            x_m: -entity.parse_value("posY")?,
-            y_m: entity.parse_value("posX")?,
+            x: entity.parse_value("posX")?,
+            y: -entity.parse_value("posY")?,
         })
     }
 }
